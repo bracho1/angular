@@ -1,36 +1,74 @@
-(function (){
+(function () {
 'use strict';
 
-      angular.module('lunch', [])
-      .controller('lunchController', MsgController);
+angular.module('ShoppingListApp', [])
+.controller('ShoppingListAddController', ShoppingListAddController)
+.service('ShoppingListService', ShoppingListService);
 
-      MsgController.$inject = ['$scope', '$filter'];
-      function MsgController($scope, $filter) {
-      $scope.items = "";
-      $scope.message = "";
-      $scope.typeOfMessage = "";
+ShoppingListAddController.$inject = ['ShoppingListService'];
+function ShoppingListAddController(ShoppingListService) {
+  var itemAdder = this;
 
-      $scope.verifyItems = function () {
-        var splitItmes = $scope.items.split(','); /*We separated the items by comma*/
-        var totalItems =splitItmes.length;
+  itemAdder.items = ShoppingListService.getItems();
+  itemAdder.boughtList = ShoppingListService.getItemsBought();
 
-        for (var i=0; i<splitItmes.length; i++){/*Verify that there is not a blank space*/
-          if((splitItmes[i].trim() == "")){
-            totalItems = totalItems -1;
-          }
-        }
+  itemAdder.addItem = function () {
+    ShoppingListService.addItem(itemAdder.itemName, itemAdder.itemQuantity);
+  }
 
-        $scope.message = totalItems; /*Show the message*/
-        if(totalItems==0){
-          $scope.message = "Please enter data first!" ;
-        }else if((totalItems >0) && (totalItems <= 3 )){
-          $scope.message = "Enjoy!" ;
-          $scope.typeOfMessage = "has-success";
-        }else if (totalItems >3) {
-          $scope.message ="Too much!" ;
-          $scope.typeOfMessage = "has-warning";
-        }
+  itemAdder.removeItem = function (itemIndex, Qtity, Name) {
+    ShoppingListService.removeItem(itemIndex);
+    ShoppingListService.addItem(Name, Qtity);
+  };
+}
 
-      };
-      }
+function ShoppingListService() {
+  var service = this;
+
+  // List of shopping items
+  var items = [{
+    name: "Milk",
+    quantity: "2"
+  },
+  {
+    name: "Donuts",
+    quantity: "24"
+  },
+  {
+    name: "Cookies",
+    quantity: "50"
+  },
+  {
+    name: "Chocolate",
+    quantity: "3"
+  },
+  {
+    name: "Waters",
+    quantity: "2"
+  }];
+
+  var boughtList = [];
+
+  service.addItem = function (itemName, quantity) {
+    var item = {
+      name: itemName,
+      quantity: quantity
+    };
+    boughtList.push(item);
+  };
+
+  service.removeItem = function (itemIdex) {
+    items.splice(itemIdex, 1);
+  };
+
+  service.getItems = function () {
+    return items;
+  };
+
+  service.getItemsBought = function () {
+    return boughtList;
+  };
+
+}
+
 })();
