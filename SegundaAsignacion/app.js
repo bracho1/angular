@@ -18,7 +18,12 @@ function ShoppingListAddController(ShoppingListService) {
 
   itemAdder.removeItem = function (itemIndex, Qtity, Name) {
     ShoppingListService.removeItem(itemIndex);
-    ShoppingListService.addItem(Name, Qtity);
+    try {
+      ShoppingListService.addItem(Name, Qtity);
+    } catch (error) {
+      itemAdder.errorMessage = error.message;
+    }
+
   };
 }
 
@@ -50,11 +55,17 @@ function ShoppingListService() {
   var boughtList = [];
 
   service.addItem = function (itemName, quantity) {
-    var item = {
-      name: itemName,
-      quantity: quantity
-    };
-    boughtList.push(item);
+
+    if(items.length <= 0){
+      throw new Error("Everything is bought!");
+    }else{
+          var item = {
+          name: itemName,
+          quantity: quantity
+        };
+        boughtList.push(item);
+    }
+
   };
 
   service.removeItem = function (itemIdex) {
